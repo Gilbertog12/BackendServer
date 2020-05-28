@@ -1,45 +1,44 @@
-//Requires
-
+// Requires
 var express = require('express');
-var moongose = require('mongoose');
+var mongoose = require('mongoose');
 
-//varibles 
 
-var puerto = 3000
-var BaseDatos = 'Hospitaldb';
-var ruta= 'localhost'
+var bodyParser = require('body-parser');
 
-//inicializar Variables
-
+// Inicializar variables
 var app = express();
 
-//Conexion BD
-moongose.connection.openUri('mongodb://localhost:27017/Hospitaldb', { useNewUrlParser: true, useUnifiedTopology: true  }), (error, res)=>{
 
-if(error){
-    throw error
-} 
-
+// Body Parser
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 
-}
-console.log('Base de Datos \x1b[32m%s\x1b[0m','online')
+// Importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+var loginRoutes = require('./routes/login');
 
-//Rutas 
 
-app.get('/', (req,res,next )=>{
+//rutas
 
-    res.status(200).json({
-        ok: true,
-        mensaje: 'Peticion Realizada Correctamente'
-    })
+app.use('/usuario', usuarioRoutes);
+app.use('/login', loginRoutes);
+app.use('/', appRoutes);
 
+// Conexión a la base de datos
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/Hospitaldb',{ useNewUrlParser: true,useUnifiedTopology: true }, (err, res) => {
+    if (err) throw err;
+    console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
 });
 
-//Escuchar peticiones 
 
-app.listen(puerto , ()=>{
-    console.log('express server corriendo en el puerto'+' '+ puerto + ' '+ '\x1b[32m%s\x1b[0m','online')
 
-    
-})
+
+
+// Escuchar peticiones
+app.listen(3000, () => {
+    console.log('Express server puerto 3000: \x1b[32m%s\x1b[0m', 'online');
+});
